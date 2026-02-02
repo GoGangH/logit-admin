@@ -59,24 +59,34 @@ export default function UsersPage() {
     {
       accessorKey: "email",
       header: "이메일",
+      size: 240,
       cell: ({ row }) => (
         <Link
           href={`/users/${row.original.id}`}
-          className="font-medium text-primary hover:underline"
+          className="font-medium text-primary hover:underline truncate block"
         >
           {row.original.email}
         </Link>
       ),
     },
-    { accessorKey: "full_name", header: "이름" },
+    {
+      accessorKey: "full_name",
+      header: "이름",
+      size: 120,
+      cell: ({ row }) => (
+        <span className="truncate block">{row.original.full_name || "-"}</span>
+      ),
+    },
     {
       accessorKey: "oauth_provider",
       header: "가입 경로",
+      size: 100,
       cell: ({ row }) => row.original.oauth_provider || "-",
     },
     {
       accessorKey: "is_active",
       header: "상태",
+      size: 80,
       cell: ({ row }) => (
         <Badge variant={row.original.is_active ? "default" : "secondary"}>
           {row.original.is_active ? "활성" : "정지"}
@@ -86,15 +96,18 @@ export default function UsersPage() {
     {
       accessorKey: "_count.projects",
       header: "프로젝트",
+      size: 80,
       cell: ({ row }) => row.original._count.projects,
     },
     {
       accessorKey: "created_at",
       header: "가입일",
+      size: 110,
       cell: ({ row }) => format(new Date(row.original.created_at), "yyyy-MM-dd"),
     },
     {
       id: "actions",
+      size: 50,
       cell: ({ row }) => (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

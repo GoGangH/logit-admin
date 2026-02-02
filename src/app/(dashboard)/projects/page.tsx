@@ -49,31 +49,42 @@ export default function ProjectsPage() {
     {
       accessorKey: "company",
       header: "회사",
+      size: 180,
       cell: ({ row }) => (
         <Link
           href={`/projects/${row.original.id}`}
-          className="font-medium text-primary hover:underline"
+          className="font-medium text-primary hover:underline truncate block"
         >
           {row.original.company}
         </Link>
       ),
     },
-    { accessorKey: "job_position", header: "직무" },
+    {
+      accessorKey: "job_position",
+      header: "직무",
+      size: 140,
+      cell: ({ row }) => (
+        <span className="truncate block">{row.original.job_position}</span>
+      ),
+    },
     {
       accessorKey: "user.email",
       header: "사용자",
+      size: 220,
       cell: ({ row }) => (
-        <span className="text-sm">{row.original.user.email}</span>
+        <span className="text-sm truncate block">{row.original.user.email}</span>
       ),
     },
     {
       accessorKey: "_count.questions",
       header: "질문 수",
+      size: 80,
       cell: ({ row }) => row.original._count.questions,
     },
     {
       accessorKey: "due_date",
       header: "마감일",
+      size: 110,
       cell: ({ row }) =>
         row.original.due_date
           ? format(new Date(row.original.due_date), "yyyy-MM-dd")
@@ -82,11 +93,13 @@ export default function ProjectsPage() {
     {
       accessorKey: "created_at",
       header: "생성일",
+      size: 110,
       cell: ({ row }) =>
         format(new Date(row.original.created_at), "yyyy-MM-dd"),
     },
     {
       id: "actions",
+      size: 50,
       cell: ({ row }) => (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

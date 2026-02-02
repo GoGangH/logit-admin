@@ -8,6 +8,7 @@ import {
   Users,
   FolderKanban,
   BookOpen,
+  Database,
   ChevronLeft,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,7 @@ const navItems = [
   { href: "/users", label: "사용자", icon: Users },
   { href: "/projects", label: "프로젝트", icon: FolderKanban },
   { href: "/experiences", label: "경험", icon: BookOpen },
+  { href: "/database", label: "데이터베이스", icon: Database },
 ];
 
 interface SidebarProps {

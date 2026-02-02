@@ -59,10 +59,11 @@ export default function ExperiencesPage() {
     {
       accessorKey: "title",
       header: "제목",
+      size: 200,
       cell: ({ row }) => (
         <Link
           href={`/experiences/${row.original.id}`}
-          className="font-medium text-primary hover:underline"
+          className="font-medium text-primary hover:underline truncate block"
         >
           {row.original.title}
         </Link>
@@ -71,13 +72,15 @@ export default function ExperiencesPage() {
     {
       accessorKey: "user_email",
       header: "사용자",
+      size: 200,
       cell: ({ row }) => (
-        <span className="text-sm">{row.original.user_email || "-"}</span>
+        <span className="text-sm truncate block">{row.original.user_email || "-"}</span>
       ),
     },
     {
       accessorKey: "experience_type",
       header: "유형",
+      size: 110,
       cell: ({ row }) => (
         <Badge variant="outline">{row.original.experience_type}</Badge>
       ),
@@ -85,6 +88,7 @@ export default function ExperiencesPage() {
     {
       accessorKey: "category",
       header: "역량",
+      size: 130,
       cell: ({ row }) => (
         <Badge variant="secondary">{row.original.category}</Badge>
       ),
@@ -92,8 +96,9 @@ export default function ExperiencesPage() {
     {
       accessorKey: "tags",
       header: "태그",
+      size: 150,
       cell: ({ row }) => (
-        <span className="text-sm text-muted-foreground">
+        <span className="text-sm text-muted-foreground truncate block">
           {row.original.tags}
         </span>
       ),
@@ -101,6 +106,7 @@ export default function ExperiencesPage() {
     {
       accessorKey: "start_date",
       header: "기간",
+      size: 170,
       cell: ({ row }) => (
         <span className="text-sm">
           {row.original.start_date} ~ {row.original.end_date}
@@ -109,6 +115,7 @@ export default function ExperiencesPage() {
     },
     {
       id: "actions",
+      size: 50,
       cell: ({ row }) => (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
