@@ -1,11 +1,17 @@
-FROM oven/bun:1.2.2-alpine AS base
+FROM node:22-alpine AS base
 
 # 1. Dependencies
 FROM base AS deps
 WORKDIR /app
+
+# Install bun
+RUN npm install -g bun
+
 COPY package.json bun.lock ./
 COPY prisma ./prisma
 COPY prisma.config.ts ./
+
+# Use bun for faster install
 RUN bun install --frozen-lockfile
 RUN bunx prisma generate
 
@@ -16,10 +22,13 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/src/generated ./src/generated
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
+
 # Dummy URL for build (Prisma client generation might need it, or code import checks it)
 ENV DATABASE_URL="postgresql://user:password@localhost:5432/dbname"
 ENV DEV_DATABASE_URL="postgresql://user:password@localhost:5432/dbname"
-RUN bun run build
+
+# Use npm run build (uses Node.js) to avoid Bun's incomplete worker_threads support
+RUN npm run build
 
 # 3. Production
 FROM base AS runner
@@ -39,4 +48,4 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-CMD ["bun", "server.js"]
+CMD ["node", "server.js"]
