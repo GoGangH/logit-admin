@@ -1,0 +1,35 @@
+services:
+  caddy:
+    image: caddy:2-alpine
+    container_name: admin-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - app
+    networks:
+      - admin-network
+
+  app:
+    image: ghcr.io/nexters/logit-admin:latest
+    container_name: admin-app
+    restart: unless-stopped
+    expose:
+      - "3000"
+    env_file:
+      - .env.production
+    networks:
+      - admin-network
+
+volumes:
+  caddy_data:
+  caddy_config:
+
+networks:
+  admin-network:
+    driver: bridge

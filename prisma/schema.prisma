@@ -1,0 +1,106 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum OAuthProvider {
+  google
+  apple
+}
+
+enum ChatRole {
+  user
+  assistant
+}
+
+model User {
+  id                String        @id @default(uuid()) @db.Uuid
+  email             String        @unique @db.VarChar(255)
+  full_name         String?       @db.VarChar(255)
+  is_active         Boolean       @default(true)
+  oauth_provider    OAuthProvider?
+  oauth_provider_id String?
+  profile_image_url String?
+  terms_agreed      Boolean       @default(false)
+  terms_agreed_at   DateTime?     @db.Timestamptz
+  refresh_token     String?
+  created_at        DateTime      @db.Timestamptz
+  updated_at        DateTime?     @db.Timestamptz
+
+  projects  Project[]
+  questions Question[]
+  chats     Chat[]
+
+  @@index([email], name: "users_email")
+  @@index([oauth_provider], name: "users_oauth_provider")
+  @@index([oauth_provider_id], name: "users_oauth_provider_id")
+  @@map("users")
+}
+
+model Project {
+  id              String    @id @default(uuid()) @db.Uuid
+  user_id         String    @db.Uuid
+  company         String    @db.VarChar(255)
+  job_position    String    @db.VarChar(100)
+  recruit_notice  String    @db.Text
+  company_talent  String?   @db.Text
+  due_date        DateTime? @db.Date
+  created_at      DateTime  @db.Timestamptz
+  updated_at      DateTime  @db.Timestamptz
+  deleted_at      DateTime? @db.Timestamptz
+
+  user      User       @relation(fields: [user_id], references: [id])
+  questions Question[]
+  chats     Chat[]
+
+  @@index([user_id], name: "projects_user_id")
+  @@map("projects")
+}
+
+model Question {
+  id         String    @id @default(uuid()) @db.Uuid
+  project_id String    @db.Uuid
+  user_id    String    @db.Uuid
+  question   String    @db.VarChar(100)
+  max_length Int?
+  order      Int       @default(1)
+  answer     String?   @db.Text
+  created_at DateTime  @db.Timestamptz
+  updated_at DateTime  @db.Timestamptz
+  deleted_at DateTime? @db.Timestamptz
+
+  project Project @relation(fields: [project_id], references: [id])
+  user    User    @relation(fields: [user_id], references: [id])
+  chats   Chat[]
+
+  @@index([project_id], name: "questions_project_id")
+  @@index([user_id], name: "questions_user_id")
+  @@map("questions")
+}
+
+model Chat {
+  id             String   @id @default(uuid()) @db.Uuid
+  project_id     String   @db.Uuid
+  question_id    String   @db.Uuid
+  user_id        String   @db.Uuid
+  role           ChatRole
+  content        String   @db.Text
+  experience_ids String[] @db.VarChar
+  is_draft       Boolean  @default(false)
+  is_selected    Boolean  @default(false)
+  created_at     DateTime @db.Timestamptz
+
+  project  Project  @relation(fields: [project_id], references: [id])
+  question Question @relation(fields: [question_id], references: [id])
+  user     User     @relation(fields: [user_id], references: [id])
+
+  @@index([project_id], name: "chats_project_id")
+  @@index([question_id], name: "chats_question_id")
+  @@index([role], name: "chats_role")
+  @@index([user_id], name: "chats_user_id")
+  @@map("chats")
+}
