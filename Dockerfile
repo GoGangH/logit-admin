@@ -1,4 +1,4 @@
-FROM node:22-alpine AS base
+FROM oven/bun:1.2.2-alpine AS base
 
 # 1. Dependencies
 FROM base AS deps
@@ -6,8 +6,8 @@ WORKDIR /app
 COPY package.json bun.lockb ./
 COPY prisma ./prisma
 COPY prisma.config.ts ./
-RUN npm install --frozen-lockfile || npm install
-RUN npx prisma generate
+RUN bun install --frozen-lockfile
+RUN bunx prisma generate
 
 # 2. Build
 FROM base AS builder
@@ -16,7 +16,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/src/generated ./src/generated
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN npm run build
+RUN bun run build
 
 # 3. Production
 FROM base AS runner
@@ -36,4 +36,4 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-CMD ["node", "server.js"]
+CMD ["bun", "server.js"]
