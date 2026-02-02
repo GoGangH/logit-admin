@@ -16,6 +16,9 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/src/generated ./src/generated
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
+# Dummy URL for build (Prisma client generation might need it, or code import checks it)
+ENV DATABASE_URL="postgresql://user:password@localhost:5432/dbname"
+ENV DEV_DATABASE_URL="postgresql://user:password@localhost:5432/dbname"
 RUN bun run build
 
 # 3. Production
