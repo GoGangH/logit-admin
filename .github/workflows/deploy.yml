@@ -52,6 +52,7 @@ jobs:
           key: ${{ secrets.ADMIN_SERVER_SSH_KEY }}
           script: |
             cd ~/logit-admin
+            git pull origin main
             docker compose pull
             docker compose up -d --remove-orphans
             docker image prune -f
