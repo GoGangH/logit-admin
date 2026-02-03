@@ -3,8 +3,9 @@
 import { useEffect, useRef, useCallback } from "react";
 import { useQuestionChats } from "@/hooks/use-chats";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Loader2, Bot, User } from "lucide-react";
+import { Loader2, User } from "lucide-react";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 import type { ChatMessage } from "@/types";
 
 interface ChatMessagePanelProps {
@@ -114,20 +115,20 @@ export function ChatMessagePanel({ userId, questionId }: ChatMessagePanelProps) 
               msg.role === "user" ? "flex-row-reverse" : "flex-row"
             )}
           >
-            <div
-              className={cn(
-                "flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
-                msg.role === "user"
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-emerald-100 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400"
-              )}
-            >
-              {msg.role === "user" ? (
+            {msg.role === "user" ? (
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
                 <User className="h-4 w-4" />
-              ) : (
-                <Bot className="h-4 w-4" />
-              )}
-            </div>
+              </div>
+            ) : (
+              <div className="relative h-8 w-8 shrink-0 overflow-hidden rounded-full">
+                <Image
+                  src="/logo_symbol_3d.svg"
+                  alt="Logit AI"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+            )}
             <div className={cn("flex flex-col max-w-[75%]", msg.role === "user" ? "items-end" : "items-start")}>
               <span className="mb-1 text-[11px] font-medium text-muted-foreground">
                 {msg.role === "user" ? "사용자" : "AI 어시스턴트"}

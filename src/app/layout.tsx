@@ -16,6 +16,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Logit Admin",
   description: "Logit 관리자 대시보드",
+  icons: {
+    icon: "/Subtract.svg",
+  },
 };
 
 export default function RootLayout({
