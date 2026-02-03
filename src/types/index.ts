@@ -64,3 +64,30 @@ export interface PaginatedResponse<T> {
   pageSize: number;
   totalPages: number;
 }
+
+export interface CursorPaginatedResponse<T> {
+  data: T[];
+  nextCursor: string | null;
+  hasMore: boolean;
+}
+
+export interface ChatMessage {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  experience_ids: string[];
+  is_draft: boolean;
+  is_selected: boolean;
+  created_at: string;
+}
+
+export interface ChatQuestion {
+  question_id: string;
+  question: string;
+  question_order: number;
+  project_id: string;
+  project_company: string;
+  project_job_position: string;
+  chat_count: number;
+  last_chat_at: string;
+}

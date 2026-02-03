@@ -17,12 +17,7 @@ export async function GET(
     const user = await prisma.user.findUnique({
       where: { id },
       include: {
-        projects: {
-          where: { deleted_at: null },
-          orderBy: { created_at: "desc" },
-          include: { _count: { select: { questions: true } } },
-        },
-        _count: { select: { chats: true } },
+        _count: { select: { chats: true, projects: true } },
       },
     });
 
@@ -30,25 +25,20 @@ export async function GET(
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    let experiences: unknown[] = [];
+    let experienceCount = 0;
     try {
-      const result = await qdrantClient.scroll(collection, {
+      const countResult = await qdrantClient.count(collection, {
         filter: {
           must: [{ key: "user_id", match: { value: id } }],
         },
-        limit: 100,
-        with_payload: true,
-        with_vector: false,
+        exact: true,
       });
-      experiences = result.points.map((p) => ({
-        id: p.id,
-        ...p.payload,
-      }));
+      experienceCount = countResult.count;
     } catch {
       // Qdrant not available
     }
 
-    return NextResponse.json({ ...user, experiences });
+    return NextResponse.json({ ...user, experienceCount });
   } catch (error) {
     console.error("User detail error:", error);
     return NextResponse.json(

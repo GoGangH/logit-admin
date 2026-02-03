@@ -3,7 +3,7 @@
 import { use, useState } from "react";
 import { useProject, useUpdateProject } from "@/hooks/use-projects";
 import { PageHeader } from "@/components/shared/page-header";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -15,10 +15,20 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
 import { format } from "date-fns";
-import { Pencil } from "lucide-react";
+import {
+  Pencil,
+  Building2,
+  Briefcase,
+  User,
+  CalendarDays,
+  FileText,
+  Star,
+  MessageSquare,
+} from "lucide-react";
 import { toast } from "sonner";
 
 export default function ProjectDetailPage({
@@ -67,10 +77,14 @@ export default function ProjectDetailPage({
 
   if (isLoading) {
     return (
-      <div className="space-y-4">
-        <Skeleton className="h-8 w-48" />
-        <Skeleton className="h-[200px]" />
-        <Skeleton className="h-[400px]" />
+      <div className="space-y-6">
+        <Skeleton className="h-8 w-64" />
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-20 rounded-2xl" />
+          ))}
+        </div>
+        <Skeleton className="h-[300px] rounded-2xl" />
       </div>
     );
   }
@@ -78,163 +92,243 @@ export default function ProjectDetailPage({
   if (!project) return <div>프로젝트를 찾을 수 없습니다.</div>;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <PageHeader title={`${project.company} - ${project.job_position}`}>
-        <Button variant="outline" size="sm" onClick={openEdit}>
-          <Pencil className="mr-2 h-4 w-4" />
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={openEdit}
+          className="rounded-full px-4"
+        >
+          <Pencil className="mr-2 h-3.5 w-3.5" />
           수정
         </Button>
       </PageHeader>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">프로젝트 정보</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <dl className="grid gap-3 sm:grid-cols-2">
-            <div>
-              <dt className="text-sm text-muted-foreground">회사</dt>
-              <dd className="font-medium">{project.company}</dd>
-            </div>
-            <div>
-              <dt className="text-sm text-muted-foreground">직무</dt>
-              <dd className="font-medium">{project.job_position}</dd>
-            </div>
-            <div>
-              <dt className="text-sm text-muted-foreground">사용자</dt>
-              <dd className="font-medium">
-                {project.user.full_name || project.user.email}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-sm text-muted-foreground">마감일</dt>
-              <dd className="font-medium">
-                {project.due_date
-                  ? format(new Date(project.due_date), "yyyy-MM-dd")
-                  : "-"}
-              </dd>
-            </div>
-            <div className="sm:col-span-2">
-              <dt className="text-sm text-muted-foreground">채용공고</dt>
-              <dd className="mt-1 whitespace-pre-wrap text-sm">
-                {project.recruit_notice}
-              </dd>
-            </div>
-            {project.company_talent && (
-              <div className="sm:col-span-2">
-                <dt className="text-sm text-muted-foreground">인재상</dt>
-                <dd className="mt-1 whitespace-pre-wrap text-sm">
-                  {project.company_talent}
-                </dd>
+      {/* Info Cards */}
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {[
+          {
+            icon: Building2,
+            label: "회사",
+            value: project.company,
+            color: "text-blue-500 bg-blue-50 dark:bg-blue-950",
+          },
+          {
+            icon: Briefcase,
+            label: "직무",
+            value: project.job_position,
+            color: "text-purple-500 bg-purple-50 dark:bg-purple-950",
+          },
+          {
+            icon: User,
+            label: "사용자",
+            value: project.user.full_name || project.user.email,
+            color: "text-emerald-500 bg-emerald-50 dark:bg-emerald-950",
+          },
+          {
+            icon: CalendarDays,
+            label: "마감일",
+            value: project.due_date
+              ? format(new Date(project.due_date), "yyyy-MM-dd")
+              : "없음",
+            color: "text-amber-500 bg-amber-50 dark:bg-amber-950",
+          },
+        ].map((item) => (
+          <Card key={item.label} className="rounded-2xl border-0 shadow-sm">
+            <CardContent className="flex items-center gap-3 p-4">
+              <div
+                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${item.color}`}
+              >
+                <item.icon className="h-5 w-5" />
               </div>
-            )}
-          </dl>
+              <div className="min-w-0">
+                <p className="text-xs text-muted-foreground">{item.label}</p>
+                <p className="truncate text-sm font-semibold">{item.value}</p>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Recruit Notice */}
+      <Card className="rounded-2xl border-0 shadow-sm">
+        <CardContent className="p-6">
+          <div className="mb-4 flex items-center gap-2">
+            <FileText className="h-4 w-4 text-muted-foreground" />
+            <h3 className="text-sm font-semibold">채용공고</h3>
+          </div>
+          <p className="whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
+            {project.recruit_notice}
+          </p>
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">
-            질문 목록 ({project.questions.length})
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {project.questions.length === 0 && (
-            <p className="py-4 text-center text-muted-foreground">
-              질문이 없습니다.
+      {project.company_talent && (
+        <Card className="rounded-2xl border-0 shadow-sm">
+          <CardContent className="p-6">
+            <div className="mb-4 flex items-center gap-2">
+              <Star className="h-4 w-4 text-muted-foreground" />
+              <h3 className="text-sm font-semibold">인재상</h3>
+            </div>
+            <p className="whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
+              {project.company_talent}
             </p>
-          )}
-          {project.questions.map(
-            (q: {
-              id: string;
-              order: number;
-              question: string;
-              max_length: number | null;
-              answer: string | null;
-            }) => (
-              <div key={q.id} className="rounded-lg border p-4">
-                <div className="mb-2 flex items-center gap-2">
-                  <Badge variant="outline">Q{q.order}</Badge>
-                  <span className="font-medium">{q.question}</span>
-                  {q.max_length && (
-                    <span className="text-xs text-muted-foreground">
-                      (최대 {q.max_length}자)
-                    </span>
-                  )}
-                </div>
-                {q.answer ? (
-                  <p className="whitespace-pre-wrap text-sm text-muted-foreground">
-                    {q.answer}
-                  </p>
-                ) : (
-                  <p className="text-sm text-muted-foreground">답변 없음</p>
-                )}
-              </div>
-            )
-          )}
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
 
+      {/* Questions */}
+      <div>
+        <div className="mb-4 flex items-center gap-2">
+          <MessageSquare className="h-4 w-4 text-muted-foreground" />
+          <h3 className="text-sm font-semibold">
+            질문 목록
+          </h3>
+          <Badge variant="secondary" className="rounded-full text-xs">
+            {project.questions.length}
+          </Badge>
+        </div>
+
+        {project.questions.length === 0 ? (
+          <Card className="rounded-2xl border-0 shadow-sm">
+            <CardContent className="py-12 text-center text-muted-foreground">
+              질문이 없습니다.
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="space-y-3">
+            {project.questions.map(
+              (q: {
+                id: string;
+                order: number;
+                question: string;
+                max_length: number | null;
+                answer: string | null;
+              }) => (
+                <Card key={q.id} className="rounded-2xl border-0 shadow-sm">
+                  <CardContent className="p-5">
+                    <div className="mb-3 flex items-start gap-3">
+                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+                        {q.order}
+                      </span>
+                      <div className="flex-1">
+                        <p className="text-sm font-semibold leading-snug">
+                          {q.question}
+                        </p>
+                        {q.max_length && (
+                          <span className="text-xs text-muted-foreground">
+                            최대 {q.max_length}자
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    {q.answer ? (
+                      <div className="ml-10 rounded-xl bg-muted/50 p-4">
+                        <p className="whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
+                          {q.answer}
+                        </p>
+                      </div>
+                    ) : (
+                      <p className="ml-10 text-sm text-muted-foreground/60">
+                        답변 없음
+                      </p>
+                    )}
+                  </CardContent>
+                </Card>
+              )
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Edit Dialog */}
       <Dialog open={editing} onOpenChange={setEditing}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-xl rounded-2xl">
           <DialogHeader>
             <DialogTitle>프로젝트 수정</DialogTitle>
+            <DialogDescription>프로젝트 정보를 수정합니다.</DialogDescription>
           </DialogHeader>
-          <div className="space-y-3">
-            <div>
-              <Label>회사</Label>
-              <Input
-                value={form.company}
-                onChange={(e) =>
-                  setForm({ ...form, company: e.target.value })
-                }
-              />
+          <div className="space-y-4 py-2">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label className="text-xs font-medium text-muted-foreground">
+                  회사
+                </Label>
+                <Input
+                  value={form.company}
+                  onChange={(e) =>
+                    setForm({ ...form, company: e.target.value })
+                  }
+                  className="rounded-xl"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-xs font-medium text-muted-foreground">
+                  직무
+                </Label>
+                <Input
+                  value={form.job_position}
+                  onChange={(e) =>
+                    setForm({ ...form, job_position: e.target.value })
+                  }
+                  className="rounded-xl"
+                />
+              </div>
             </div>
-            <div>
-              <Label>직무</Label>
-              <Input
-                value={form.job_position}
-                onChange={(e) =>
-                  setForm({ ...form, job_position: e.target.value })
-                }
-              />
-            </div>
-            <div>
-              <Label>마감일</Label>
+            <div className="space-y-2">
+              <Label className="text-xs font-medium text-muted-foreground">
+                마감일
+              </Label>
               <Input
                 type="date"
                 value={form.due_date}
                 onChange={(e) =>
                   setForm({ ...form, due_date: e.target.value })
                 }
+                className="w-full rounded-xl sm:w-auto"
               />
             </div>
-            <div>
-              <Label>채용공고</Label>
+            <div className="space-y-2">
+              <Label className="text-xs font-medium text-muted-foreground">
+                채용공고
+              </Label>
               <Textarea
                 value={form.recruit_notice}
                 onChange={(e) =>
                   setForm({ ...form, recruit_notice: e.target.value })
                 }
-                rows={4}
+                rows={5}
+                className="rounded-xl resize-none"
               />
             </div>
-            <div>
-              <Label>인재상</Label>
+            <div className="space-y-2">
+              <Label className="text-xs font-medium text-muted-foreground">
+                인재상
+              </Label>
               <Textarea
                 value={form.company_talent}
                 onChange={(e) =>
                   setForm({ ...form, company_talent: e.target.value })
                 }
                 rows={3}
+                className="rounded-xl resize-none"
               />
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setEditing(false)}>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              variant="ghost"
+              onClick={() => setEditing(false)}
+              className="rounded-xl"
+            >
               취소
             </Button>
-            <Button onClick={handleSave} disabled={updateProject.isPending}>
+            <Button
+              onClick={handleSave}
+              disabled={updateProject.isPending}
+              className="rounded-xl"
+            >
               {updateProject.isPending ? "저장 중..." : "저장"}
             </Button>
           </DialogFooter>

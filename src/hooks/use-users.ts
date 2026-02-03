@@ -1,6 +1,15 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import type { PaginatedResponse } from "@/types";
+import type { PaginatedResponse, Experience } from "@/types";
 import type { User } from "@/generated/prisma/client";
+
+type ProjectItem = {
+  id: string;
+  company: string;
+  job_position: string;
+  due_date: string | null;
+  created_at: string;
+  _count: { questions: number };
+};
 
 interface UseUsersParams {
   page?: number;
@@ -68,5 +77,53 @@ export function useDeleteUser() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["users"] });
     },
+  });
+}
+
+export function useUserProjects({
+  userId,
+  page = 1,
+  pageSize = 10,
+}: {
+  userId: string;
+  page?: number;
+  pageSize?: number;
+}) {
+  return useQuery<PaginatedResponse<ProjectItem>>({
+    queryKey: ["users", userId, "projects", { page, pageSize }],
+    queryFn: async () => {
+      const params = new URLSearchParams({
+        page: String(page),
+        pageSize: String(pageSize),
+      });
+      const res = await fetch(`/api/users/${userId}/projects?${params}`);
+      if (!res.ok) throw new Error("Failed to fetch projects");
+      return res.json();
+    },
+    enabled: !!userId,
+  });
+}
+
+export function useUserExperiences({
+  userId,
+  page = 1,
+  pageSize = 10,
+}: {
+  userId: string;
+  page?: number;
+  pageSize?: number;
+}) {
+  return useQuery<PaginatedResponse<Experience>>({
+    queryKey: ["users", userId, "experiences", { page, pageSize }],
+    queryFn: async () => {
+      const params = new URLSearchParams({
+        page: String(page),
+        pageSize: String(pageSize),
+      });
+      const res = await fetch(`/api/users/${userId}/experiences?${params}`);
+      if (!res.ok) throw new Error("Failed to fetch experiences");
+      return res.json();
+    },
+    enabled: !!userId,
   });
 }

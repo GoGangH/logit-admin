@@ -1,7 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { useUsers, useToggleUserActive, useDeleteUser } from "@/hooks/use-users";
+import {
+  useUsers,
+  useToggleUserActive,
+  useDeleteUser,
+} from "@/hooks/use-users";
 import { DataTable } from "@/components/shared/data-table";
 import { PageHeader } from "@/components/shared/page-header";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
@@ -25,6 +29,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal, Search } from "lucide-react";
 import { format } from "date-fns";
 import Link from "next/link";
+import Image from "next/image";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -32,11 +37,57 @@ type UserRow = {
   id: string;
   email: string;
   full_name: string | null;
+  profile_image_url: string | null;
   oauth_provider: string | null;
   is_active: boolean;
   created_at: string;
   _count: { projects: number; chats: number };
 };
+
+const GRADIENT_COLORS = [
+  "from-blue-500 to-blue-600",
+  "from-purple-500 to-purple-600",
+  "from-emerald-500 to-emerald-600",
+  "from-rose-500 to-rose-600",
+  "from-amber-500 to-amber-600",
+  "from-sky-500 to-sky-600",
+  "from-pink-500 to-pink-600",
+  "from-teal-500 to-teal-600",
+];
+
+function getGradient(str: string) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return GRADIENT_COLORS[Math.abs(hash) % GRADIENT_COLORS.length];
+}
+
+function UserAvatar({ user }: { user: UserRow }) {
+  const initial = (user.full_name || user.email)[0].toUpperCase();
+  const gradient = getGradient(user.email);
+
+  if (user.profile_image_url) {
+    return (
+      <Image
+        src={user.profile_image_url}
+        alt={user.full_name || user.email}
+        width={32}
+        height={32}
+        className="rounded-full object-cover shrink-0"
+        style={{ width: 32, height: 32 }}
+      />
+    );
+  }
+
+  return (
+    <div
+      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${gradient} text-xs font-semibold text-white`}
+    >
+      {initial}
+    </div>
+  );
+}
 
 export default function UsersPage() {
   const [page, setPage] = useState(1);
@@ -58,37 +109,50 @@ export default function UsersPage() {
   const columns: ColumnDef<UserRow>[] = [
     {
       accessorKey: "email",
-      header: "이메일",
-      size: 240,
+      header: "사용자",
+      size: 300,
       cell: ({ row }) => (
         <Link
           href={`/users/${row.original.id}`}
-          className="font-medium text-primary hover:underline truncate block"
+          className="flex items-center gap-3 min-w-0"
         >
-          {row.original.email}
+          <UserAvatar user={row.original} />
+          <div className="min-w-0">
+            <p className="text-sm font-medium text-foreground hover:text-primary transition-colors truncate">
+              {row.original.full_name || row.original.email.split("@")[0]}
+            </p>
+            <p className="text-xs text-muted-foreground truncate">
+              {row.original.email}
+            </p>
+          </div>
         </Link>
-      ),
-    },
-    {
-      accessorKey: "full_name",
-      header: "이름",
-      size: 120,
-      cell: ({ row }) => (
-        <span className="truncate block">{row.original.full_name || "-"}</span>
       ),
     },
     {
       accessorKey: "oauth_provider",
       header: "가입 경로",
       size: 100,
-      cell: ({ row }) => row.original.oauth_provider || "-",
+      cell: ({ row }) =>
+        row.original.oauth_provider ? (
+          <Badge
+            variant="outline"
+            className="rounded-full text-[10px] px-2 py-0"
+          >
+            {row.original.oauth_provider}
+          </Badge>
+        ) : (
+          <span className="text-muted-foreground">-</span>
+        ),
     },
     {
       accessorKey: "is_active",
       header: "상태",
       size: 80,
       cell: ({ row }) => (
-        <Badge variant={row.original.is_active ? "default" : "secondary"}>
+        <Badge
+          variant={row.original.is_active ? "default" : "secondary"}
+          className="rounded-full text-[10px] px-2 py-0"
+        >
           {row.original.is_active ? "활성" : "정지"}
         </Badge>
       ),
@@ -103,7 +167,8 @@ export default function UsersPage() {
       accessorKey: "created_at",
       header: "가입일",
       size: 110,
-      cell: ({ row }) => format(new Date(row.original.created_at), "yyyy-MM-dd"),
+      cell: ({ row }) =>
+        format(new Date(row.original.created_at), "yyyy-MM-dd"),
     },
     {
       id: "actions",
@@ -111,7 +176,7 @@ export default function UsersPage() {
       cell: ({ row }) => (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8">
+            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
               <MoreHorizontal className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
