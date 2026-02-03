@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import {
@@ -37,16 +38,37 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
       )}
     >
       <div className="flex h-14 items-center justify-between border-b px-4">
-        {!collapsed && (
-          <Link href="/dashboard" className="text-lg font-bold">
-            Logit Admin
+        <Link
+          href="/dashboard"
+          className={cn("flex items-center gap-2", collapsed && "hidden")}
+        >
+          <Image
+            src="/logo_splash.svg"
+            alt="Logit"
+            width={80}
+            height={24}
+            className="h-6 w-auto"
+          />
+          <span className="text-[11px] font-semibold text-muted-foreground tracking-wider uppercase">
+            Admin
+          </span>
+        </Link>
+        {collapsed && (
+          <Link href="/dashboard" className="mx-auto">
+            <Image
+              src="/Subtract.svg"
+              alt="Logit"
+              width={24}
+              height={24}
+              className="h-6 w-6"
+            />
           </Link>
         )}
         <Button
           variant="ghost"
           size="icon"
           onClick={onToggle}
-          className={cn("h-8 w-8", collapsed && "mx-auto")}
+          className="h-8 w-8 shrink-0"
         >
           <ChevronLeft
             className={cn(

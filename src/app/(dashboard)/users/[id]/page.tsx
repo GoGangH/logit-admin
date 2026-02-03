@@ -10,15 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
-import {
-  Mail,
-  User,
-  Globe,
-  CalendarDays,
-  MessageSquare,
-  FolderKanban,
-  BookOpen,
-} from "lucide-react";
+import { MessageSquare, FolderKanban, BookOpen } from "lucide-react";
 
 export default function UserDetailPage({
   params,
@@ -31,12 +23,7 @@ export default function UserDetailPage({
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <Skeleton className="h-8 w-48" />
-        <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-6">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <Skeleton key={i} className="h-20 rounded-2xl" />
-          ))}
-        </div>
+        <Skeleton className="h-36 rounded-2xl" />
         <Skeleton className="h-[400px] rounded-2xl" />
       </div>
     );
@@ -50,86 +37,44 @@ export default function UserDetailPage({
 
   return (
     <div className="space-y-8">
-      {/* Profile Header */}
-      <div className="flex items-center gap-4">
-        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary/60 text-xl font-bold text-primary-foreground">
-          {initial}
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight truncate">
-              {user.full_name || user.email}
-            </h1>
-            <Badge
-              variant={user.is_active ? "default" : "secondary"}
-              className="rounded-full shrink-0"
-            >
-              {user.is_active ? "활성" : "정지"}
-            </Badge>
-          </div>
-          <p className="text-sm text-muted-foreground truncate">{user.email}</p>
-        </div>
-      </div>
-
-      {/* Info Cards */}
-      <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-6">
-        {[
-          {
-            icon: Mail,
-            label: "이메일",
-            value: user.email,
-            color: "text-blue-500 bg-blue-50 dark:bg-blue-950",
-          },
-          {
-            icon: User,
-            label: "이름",
-            value: user.full_name || "-",
-            color: "text-purple-500 bg-purple-50 dark:bg-purple-950",
-          },
-          {
-            icon: Globe,
-            label: "가입 경로",
-            value: user.oauth_provider || "-",
-            color: "text-emerald-500 bg-emerald-50 dark:bg-emerald-950",
-          },
-          {
-            icon: CalendarDays,
-            label: "가입일",
-            value: format(new Date(user.created_at), "yyyy-MM-dd"),
-            color: "text-amber-500 bg-amber-50 dark:bg-amber-950",
-          },
-          {
-            icon: FolderKanban,
-            label: "프로젝트",
-            value: `${projectCount}개`,
-            color: "text-rose-500 bg-rose-50 dark:bg-rose-950",
-          },
-          {
-            icon: MessageSquare,
-            label: "채팅",
-            value: `${user._count?.chats ?? 0}건`,
-            color: "text-sky-500 bg-sky-50 dark:bg-sky-950",
-          },
-        ].map((item) => (
-          <Card key={item.label} className="rounded-2xl border-0 shadow-sm">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2.5">
-                <div
-                  className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${item.color}`}
+      {/* Profile */}
+      <Card className="rounded-2xl border-0 shadow-sm">
+        <CardContent className="p-6">
+          <div className="flex items-center gap-4">
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary/60 text-xl font-bold text-primary-foreground">
+              {initial}
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2">
+                <h1 className="text-2xl font-bold tracking-tight truncate">
+                  {user.full_name || user.email}
+                </h1>
+                <Badge
+                  variant={user.is_active ? "default" : "secondary"}
+                  className="rounded-full shrink-0"
                 >
-                  <item.icon className="h-4 w-4" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-[10px] text-muted-foreground">
-                    {item.label}
-                  </p>
-                  <p className="truncate text-sm font-semibold">{item.value}</p>
-                </div>
+                  {user.is_active ? "활성" : "정지"}
+                </Badge>
               </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+              <p className="text-sm text-muted-foreground truncate">{user.email}</p>
+            </div>
+          </div>
+
+          <div className="mt-5 grid grid-cols-2 gap-x-8 gap-y-3 sm:grid-cols-4 border-t pt-5">
+            {[
+              { label: "가입 경로", value: user.oauth_provider || "-" },
+              { label: "가입일", value: format(new Date(user.created_at), "yyyy-MM-dd") },
+              { label: "프로젝트", value: `${projectCount}개` },
+              { label: "채팅", value: `${user._count?.chats ?? 0}건` },
+            ].map((item) => (
+              <div key={item.label}>
+                <p className="text-xs text-muted-foreground">{item.label}</p>
+                <p className="mt-0.5 text-sm font-semibold">{item.value}</p>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Tabs */}
       <Tabs defaultValue="projects">

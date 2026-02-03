@@ -2,6 +2,7 @@
 
 import { use, useState } from "react";
 import { useProject, useUpdateProject } from "@/hooks/use-projects";
+import { ChatWindow } from "@/components/users/chat-window";
 import { PageHeader } from "@/components/shared/page-header";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -39,6 +40,10 @@ export default function ProjectDetailPage({
   const { id } = use(params);
   const { data: project, isLoading } = useProject(id);
   const updateProject = useUpdateProject();
+  const [chatQuestion, setChatQuestion] = useState<{
+    id: string;
+    question: string;
+  } | null>(null);
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({
     company: "",
@@ -234,6 +239,19 @@ export default function ProjectDetailPage({
                         답변 없음
                       </p>
                     )}
+                    <div className="ml-10 mt-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="gap-1.5 rounded-full text-xs text-muted-foreground hover:text-foreground"
+                        onClick={() =>
+                          setChatQuestion({ id: q.id, question: q.question })
+                        }
+                      >
+                        <MessageSquare className="h-3.5 w-3.5" />
+                        채팅 보기
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               )
@@ -241,6 +259,17 @@ export default function ProjectDetailPage({
           </div>
         )}
       </div>
+
+      {/* Chat Window */}
+      {chatQuestion && (
+        <ChatWindow
+          userId={project.user_id}
+          questionId={chatQuestion.id}
+          title={chatQuestion.question}
+          subtitle={`${project.company} — ${project.job_position}`}
+          onClose={() => setChatQuestion(null)}
+        />
+      )}
 
       {/* Edit Dialog */}
       <Dialog open={editing} onOpenChange={setEditing}>

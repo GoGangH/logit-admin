@@ -2,18 +2,11 @@
 
 import { useState } from "react";
 import { useUserChatQuestions } from "@/hooks/use-chats";
-import { ChatMessagePanel } from "./chat-message-panel";
+import { ChatWindow } from "./chat-window";
 import { CardPagination } from "@/components/shared/pagination";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetDescription,
-} from "@/components/ui/sheet";
 import { MessageSquare } from "lucide-react";
 import { format } from "date-fns";
 import type { ChatQuestion } from "@/types";
@@ -88,29 +81,15 @@ export function UserChatHistory({ userId }: { userId: string }) {
         />
       )}
 
-      <Sheet
-        open={!!activeQuestion}
-        onOpenChange={(open) => {
-          if (!open) setActiveQuestion(null);
-        }}
-      >
-        <SheetContent side="right" className="w-full sm:max-w-lg flex flex-col p-0">
-          <SheetHeader className="px-4 pt-4 pb-2 border-b shrink-0">
-            <SheetTitle className="text-sm truncate pr-8">
-              {activeQuestion?.question}
-            </SheetTitle>
-            <SheetDescription className="text-xs truncate">
-              {activeQuestion?.project_company} — {activeQuestion?.project_job_position}
-            </SheetDescription>
-          </SheetHeader>
-          {activeQuestion && (
-            <ChatMessagePanel
-              userId={userId}
-              questionId={activeQuestion.question_id}
-            />
-          )}
-        </SheetContent>
-      </Sheet>
+      {activeQuestion && (
+        <ChatWindow
+          userId={userId}
+          questionId={activeQuestion.question_id}
+          title={activeQuestion.question}
+          subtitle={`${activeQuestion.project_company} — ${activeQuestion.project_job_position}`}
+          onClose={() => setActiveQuestion(null)}
+        />
+      )}
     </div>
   );
 }
