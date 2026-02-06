@@ -11,12 +11,17 @@ export async function GET(req: NextRequest) {
     const search = searchParams.get("search") || "";
     const isActive = searchParams.get("isActive");
 
+    // UUID 형식 체크
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(search);
+
     const where = {
       ...(search && {
-        OR: [
-          { email: { contains: search, mode: "insensitive" as const } },
-          { full_name: { contains: search, mode: "insensitive" as const } },
-        ],
+        OR: isUuid
+          ? [{ id: search }]
+          : [
+              { email: { contains: search, mode: "insensitive" as const } },
+              { full_name: { contains: search, mode: "insensitive" as const } },
+            ],
       }),
       ...(isActive !== null &&
         isActive !== undefined &&

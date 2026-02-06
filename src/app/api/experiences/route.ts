@@ -95,16 +95,27 @@ export async function GET(req: NextRequest) {
     });
 
     // Client-side search filter (Qdrant doesn't support text search well)
+    // UUID 형식이면 ID 또는 user_id로 검색
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(search);
+
     const filtered = search
-      ? data.filter(
-          (d) =>
-            (d.title as string | undefined)?.toLowerCase().includes(search.toLowerCase()) ||
-            d.user_email?.toLowerCase().includes(search.toLowerCase())
+      ? data.filter((d) =>
+          isUuid
+            ? String(d.id) === search || (d.user_id as string) === search
+            : (d.title as string | undefined)?.toLowerCase().includes(search.toLowerCase()) ||
+              d.user_email?.toLowerCase().includes(search.toLowerCase())
         )
       : data;
 
+    // created_at 기준 내림차순 정렬
+    const sorted = filtered.sort((a, b) => {
+      const aDate = a.created_at ? new Date(a.created_at as string).getTime() : 0;
+      const bDate = b.created_at ? new Date(b.created_at as string).getTime() : 0;
+      return bDate - aDate;
+    });
+
     return NextResponse.json({
-      data: filtered,
+      data: sorted,
       total: search ? filtered.length : total,
       page,
       pageSize,

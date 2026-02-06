@@ -10,18 +10,23 @@ export async function GET(req: NextRequest) {
     const pageSize = parseInt(searchParams.get("pageSize") || "20");
     const search = searchParams.get("search") || "";
 
+    // UUID 형식 체크
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(search);
+
     const where = {
       deleted_at: null,
       ...(search && {
-        OR: [
-          { company: { contains: search, mode: "insensitive" as const } },
-          { job_position: { contains: search, mode: "insensitive" as const } },
-          {
-            user: {
-              email: { contains: search, mode: "insensitive" as const },
-            },
-          },
-        ],
+        OR: isUuid
+          ? [{ id: search }, { user_id: search }]
+          : [
+              { company: { contains: search, mode: "insensitive" as const } },
+              { job_position: { contains: search, mode: "insensitive" as const } },
+              {
+                user: {
+                  email: { contains: search, mode: "insensitive" as const },
+                },
+              },
+            ],
       }),
     };
 
