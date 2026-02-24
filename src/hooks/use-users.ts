@@ -110,10 +110,25 @@ export interface UserSubscription {
   type: "mcp" | "logit";
   is_active: boolean;
   plan: "free_trial" | "basic" | "pro";
+  mcp_token: string | null;
   started_at: string | null;
   expires_at: string | null;
   created_at: string;
   updated_at: string | null;
+}
+
+export function useIssueMcpSubscription(userId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (): Promise<{ token: string }> => {
+      const res = await fetch(`/api/users/${userId}/subscription`, { method: "POST" });
+      if (!res.ok) throw new Error("Failed to issue MCP subscription");
+      return res.json();
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["users", userId, "subscriptions"] });
+    },
+  });
 }
 
 export function useUserSubscriptions(userId: string) {
