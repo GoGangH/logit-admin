@@ -22,6 +22,7 @@ export function UserDetailContent({
 }) {
   const { data: user, isLoading } = useUser(id);
   const { data: subscriptionData } = useUserSubscriptions(id);
+  const issueMcp = useIssueMcpSubscription(id);
 
   if (isLoading) {
     return (
@@ -39,7 +40,6 @@ export function UserDetailContent({
   const experienceCount = user.experienceCount ?? 0;
   const subscriptions = subscriptionData?.data ?? [];
   const mcpSub = subscriptions.find((s: { type: string }) => s.type === "mcp");
-  const issueMcp = useIssueMcpSubscription(id);
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
