@@ -77,9 +77,10 @@ export async function POST(
 
     return NextResponse.json({ token });
   } catch (error) {
-    console.error("MCP subscription issue error:", error);
+    const message = error instanceof Error ? error.message : String(error);
+    console.error("MCP subscription issue error:", message);
     return NextResponse.json(
-      { error: "Failed to issue MCP subscription" },
+      { error: message },
       { status: 500 }
     );
   }
