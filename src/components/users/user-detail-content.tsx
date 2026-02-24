@@ -10,8 +10,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
-import { MessageSquare, FolderKanban, BookOpen, Copy, CheckCircle2, XCircle, Clock } from "lucide-react";
+import { MessageSquare, FolderKanban, BookOpen, Copy, CheckCircle2, XCircle, Clock, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
+import { useState } from "react";
 
 export function UserDetailContent({
   id,
@@ -23,6 +24,7 @@ export function UserDetailContent({
   const { data: user, isLoading } = useUser(id);
   const { data: subscriptionData } = useUserSubscriptions(id);
   const issueMcp = useIssueMcpSubscription(id);
+  const [showToken, setShowToken] = useState(false);
 
   if (isLoading) {
     return (
@@ -173,15 +175,23 @@ export function UserDetailContent({
               {mcpSub.token && (
                 <div className="mt-4 pt-4 border-t">
                   <p className="text-xs text-muted-foreground mb-1.5">MCP 토큰</p>
-                  <button
-                    onClick={() => copyToClipboard(mcpSub.token!)}
-                    className="flex items-center gap-2 w-full group"
-                  >
-                    <code className="flex-1 text-[10px] font-mono bg-muted rounded-lg px-3 py-2 truncate text-left text-muted-foreground group-hover:text-foreground transition-colors">
+                  <div className="flex items-center gap-2">
+                    <code className={`flex-1 text-[10px] font-mono bg-muted rounded-lg px-3 py-2 truncate text-left text-muted-foreground transition-all select-none ${!showToken ? "blur-sm" : ""}`}>
                       {mcpSub.token}
                     </code>
-                    <Copy className="h-3.5 w-3.5 shrink-0 text-muted-foreground group-hover:text-foreground transition-colors" />
-                  </button>
+                    <button
+                      onClick={() => setShowToken((v) => !v)}
+                      className="shrink-0 text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {showToken ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                    </button>
+                    <button
+                      onClick={() => copyToClipboard(mcpSub.token!)}
+                      className="shrink-0 text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      <Copy className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
                 </div>
               )}
             </>
