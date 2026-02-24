@@ -64,10 +64,10 @@ export async function POST(
 
     await prisma.$queryRawUnsafe(
       `INSERT INTO subscriptions (id, user_id, type, is_active, plan, token, started_at, expires_at, created_at)
-       VALUES (gen_random_uuid(), $1::uuid, 'mcp', true, 'free_trial', $2, NOW(), NOW() + INTERVAL '30 days', NOW())
+       VALUES (gen_random_uuid(), $1::uuid, 'mcp'::subscriptiontype, true, 'free_trial'::subscriptionplan, $2, NOW(), NOW() + INTERVAL '30 days', NOW())
        ON CONFLICT (user_id, type) DO UPDATE SET
          is_active  = true,
-         plan       = 'free_trial',
+         plan       = 'free_trial'::subscriptionplan,
          token      = $2,
          started_at = NOW(),
          expires_at = NOW() + INTERVAL '30 days'`,
