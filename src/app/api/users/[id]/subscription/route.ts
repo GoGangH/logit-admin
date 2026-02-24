@@ -19,14 +19,13 @@ export async function GET(
         type: string;
         is_active: boolean;
         plan: string;
-        mcp_token: string | null;
+        token: string | null;
         started_at: Date | null;
         expires_at: Date | null;
         created_at: Date;
-        updated_at: Date | null;
       }[]
     >(
-      `SELECT id, user_id, type, is_active, plan, mcp_token, started_at, expires_at, created_at, updated_at
+      `SELECT id, user_id, type, is_active, plan, token, started_at, expires_at, created_at
        FROM subscriptions
        WHERE user_id = $1::uuid
        ORDER BY created_at DESC`,
@@ -64,15 +63,14 @@ export async function POST(
     const token = await createMcpToken(userId, env);
 
     await prisma.$queryRawUnsafe(
-      `INSERT INTO subscriptions (id, user_id, type, is_active, plan, mcp_token, started_at, expires_at, created_at)
+      `INSERT INTO subscriptions (id, user_id, type, is_active, plan, token, started_at, expires_at, created_at)
        VALUES (gen_random_uuid(), $1::uuid, 'mcp', true, 'free_trial', $2, NOW(), NOW() + INTERVAL '30 days', NOW())
        ON CONFLICT (user_id, type) DO UPDATE SET
-         is_active   = true,
-         plan        = 'free_trial',
-         mcp_token   = $2,
-         started_at  = NOW(),
-         expires_at  = NOW() + INTERVAL '30 days',
-         updated_at  = NOW()`,
+         is_active  = true,
+         plan       = 'free_trial',
+         token      = $2,
+         started_at = NOW(),
+         expires_at = NOW() + INTERVAL '30 days'`,
       userId,
       token
     );

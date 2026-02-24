@@ -170,15 +170,15 @@ export function UserDetailContent({
                   </div>
                 ))}
               </div>
-              {mcpSub.mcp_token && (
+              {mcpSub.token && (
                 <div className="mt-4 pt-4 border-t">
                   <p className="text-xs text-muted-foreground mb-1.5">MCP 토큰</p>
                   <button
-                    onClick={() => copyToClipboard(mcpSub.mcp_token!)}
+                    onClick={() => copyToClipboard(mcpSub.token!)}
                     className="flex items-center gap-2 w-full group"
                   >
                     <code className="flex-1 text-[10px] font-mono bg-muted rounded-lg px-3 py-2 truncate text-left text-muted-foreground group-hover:text-foreground transition-colors">
-                      {mcpSub.mcp_token}
+                      {mcpSub.token}
                     </code>
                     <Copy className="h-3.5 w-3.5 shrink-0 text-muted-foreground group-hover:text-foreground transition-colors" />
                   </button>

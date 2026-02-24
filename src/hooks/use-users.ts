@@ -110,11 +110,10 @@ export interface UserSubscription {
   type: "mcp" | "logit";
   is_active: boolean;
   plan: "free_trial" | "basic" | "pro";
-  mcp_token: string | null;
+  token: string | null;
   started_at: string | null;
   expires_at: string | null;
   created_at: string;
-  updated_at: string | null;
 }
 
 export function useIssueMcpSubscription(userId: string) {
