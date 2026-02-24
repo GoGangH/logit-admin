@@ -186,6 +186,20 @@ export function UserExperiencesTab({ userId }: { userId: string }) {
                 {exp.title}
               </Link>
               <div className="mt-1.5 flex flex-wrap gap-1.5">
+                {exp.format && (
+                  <Badge
+                    variant="outline"
+                    className={`rounded-full text-[10px] px-2 py-0 ${
+                      exp.format === "STAR"
+                        ? "border-blue-300 text-blue-600"
+                        : exp.format === "PSI"
+                        ? "border-red-300 text-red-600"
+                        : "border-gray-300 text-gray-600"
+                    }`}
+                  >
+                    {exp.format}
+                  </Badge>
+                )}
                 <Badge
                   variant="outline"
                   className="rounded-full text-[10px] px-2 py-0"

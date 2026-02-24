@@ -20,6 +20,8 @@ export type ExperienceCategory =
   | "유연한 적응력"
   | "끈기있는 책임감";
 
+export type ExperienceFormat = "STAR" | "PSI" | "FREE";
+
 export interface Experience {
   id: string;
   user_id: string;
@@ -27,10 +29,18 @@ export interface Experience {
   start_date: string;
   end_date: string;
   experience_type: ExperienceType;
-  situation: string;
-  task: string;
-  action: string;
-  result: string;
+  format?: ExperienceFormat;
+  // STAR format
+  situation?: string;
+  task?: string;
+  action?: string;
+  result?: string;
+  // PSI format
+  problem?: string;
+  solution?: string;
+  impact?: string;
+  // FREE format
+  content?: string;
   category: ExperienceCategory;
   tags: string;
   created_at: string;

@@ -104,6 +104,30 @@ export function useUserProjects({
   });
 }
 
+export interface UserSubscription {
+  id: string;
+  user_id: string;
+  type: "mcp" | "logit";
+  is_active: boolean;
+  plan: "free_trial" | "basic" | "pro";
+  started_at: string | null;
+  expires_at: string | null;
+  created_at: string;
+  updated_at: string | null;
+}
+
+export function useUserSubscriptions(userId: string) {
+  return useQuery<{ data: UserSubscription[] }>({
+    queryKey: ["users", userId, "subscriptions"],
+    queryFn: async () => {
+      const res = await fetch(`/api/users/${userId}/subscription`);
+      if (!res.ok) throw new Error("Failed to fetch subscriptions");
+      return res.json();
+    },
+    enabled: !!userId,
+  });
+}
+
 export function useUserExperiences({
   userId,
   page = 1,

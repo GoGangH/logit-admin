@@ -36,9 +36,13 @@ import {
   Target,
   Zap,
   Trophy,
+  AlertCircle,
+  Lightbulb,
+  TrendingUp,
+  FileText,
 } from "lucide-react";
 import { toast } from "sonner";
-import type { ExperienceType, ExperienceCategory } from "@/types";
+import type { ExperienceType, ExperienceCategory, ExperienceFormat } from "@/types";
 
 const EXPERIENCE_TYPES: ExperienceType[] = [
   "아르바이트", "인턴", "정규직", "계약직", "봉사 활동",
@@ -85,6 +89,33 @@ const STAR_CONFIG = [
   },
 ];
 
+const PSI_CONFIG = [
+  {
+    key: "problem" as const,
+    label: "Problem",
+    sub: "문제",
+    icon: AlertCircle,
+    color: "text-red-500 bg-red-50 dark:bg-red-950",
+    borderColor: "border-l-red-500",
+  },
+  {
+    key: "solution" as const,
+    label: "Solution",
+    sub: "해결",
+    icon: Lightbulb,
+    color: "text-amber-500 bg-amber-50 dark:bg-amber-950",
+    borderColor: "border-l-amber-500",
+  },
+  {
+    key: "impact" as const,
+    label: "Impact",
+    sub: "결과",
+    icon: TrendingUp,
+    color: "text-emerald-500 bg-emerald-50 dark:bg-emerald-950",
+    borderColor: "border-l-emerald-500",
+  },
+];
+
 export default function ExperienceDetailPage({
   params,
 }: {
@@ -100,12 +131,21 @@ export default function ExperienceDetailPage({
     category: "" as ExperienceCategory,
     start_date: "",
     end_date: "",
+    // STAR
     situation: "",
     task: "",
     action: "",
     result: "",
+    // PSI
+    problem: "",
+    solution: "",
+    impact: "",
+    // FREE
+    content: "",
     tags: "",
   });
+
+  const experienceFormat: ExperienceFormat = experience?.format ?? "STAR";
 
   const openEdit = () => {
     if (!experience) return;
@@ -115,10 +155,14 @@ export default function ExperienceDetailPage({
       category: experience.category,
       start_date: experience.start_date,
       end_date: experience.end_date,
-      situation: experience.situation,
-      task: experience.task,
-      action: experience.action,
-      result: experience.result,
+      situation: experience.situation ?? "",
+      task: experience.task ?? "",
+      action: experience.action ?? "",
+      result: experience.result ?? "",
+      problem: experience.problem ?? "",
+      solution: experience.solution ?? "",
+      impact: experience.impact ?? "",
+      content: experience.content ?? "",
       tags: experience.tags,
     });
     setEditing(true);
@@ -215,6 +259,23 @@ export default function ExperienceDetailPage({
         ))}
       </div>
 
+      {/* Format Badge */}
+      <div className="flex items-center gap-2">
+        <span className="text-xs text-muted-foreground">작성 형식:</span>
+        <Badge
+          variant="outline"
+          className={`rounded-full text-xs px-3 ${
+            experienceFormat === "STAR"
+              ? "border-blue-300 text-blue-600 bg-blue-50 dark:bg-blue-950"
+              : experienceFormat === "PSI"
+              ? "border-red-300 text-red-600 bg-red-50 dark:bg-red-950"
+              : "border-gray-300 text-gray-600"
+          }`}
+        >
+          {experienceFormat}
+        </Badge>
+      </div>
+
       {/* Tags */}
       {experience.tags && (
         <div className="flex items-center gap-2">
@@ -233,39 +294,77 @@ export default function ExperienceDetailPage({
         </div>
       )}
 
-      {/* STAR */}
-      <div>
-        <h3 className="mb-4 text-sm font-semibold text-muted-foreground">
-          STAR 분석
-        </h3>
-        <div className="space-y-3">
-          {STAR_CONFIG.map((item) => (
-            <Card
-              key={item.key}
-              className={`rounded-2xl border-0 border-l-4 shadow-sm ${item.borderColor}`}
-            >
-              <CardContent className="p-5">
-                <div className="mb-3 flex items-center gap-2.5">
-                  <div
-                    className={`flex h-8 w-8 items-center justify-center rounded-lg ${item.color}`}
-                  >
-                    <item.icon className="h-4 w-4" />
+      {/* Format Content */}
+      {experienceFormat === "STAR" && (
+        <div>
+          <h3 className="mb-4 text-sm font-semibold text-muted-foreground">STAR 분석</h3>
+          <div className="space-y-3">
+            {STAR_CONFIG.map((item) => (
+              <Card key={item.key} className={`rounded-2xl border-0 border-l-4 shadow-sm ${item.borderColor}`}>
+                <CardContent className="p-5">
+                  <div className="mb-3 flex items-center gap-2.5">
+                    <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${item.color}`}>
+                      <item.icon className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <span className="text-sm font-bold">{item.label}</span>
+                      <span className="ml-1.5 text-xs text-muted-foreground">{item.sub}</span>
+                    </div>
                   </div>
-                  <div>
-                    <span className="text-sm font-bold">{item.label}</span>
-                    <span className="ml-1.5 text-xs text-muted-foreground">
-                      {item.sub}
-                    </span>
-                  </div>
-                </div>
-                <p className="whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
-                  {experience[item.key]}
-                </p>
-              </CardContent>
-            </Card>
-          ))}
+                  <p className="whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
+                    {experience[item.key] || "-"}
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
+
+      {experienceFormat === "PSI" && (
+        <div>
+          <h3 className="mb-4 text-sm font-semibold text-muted-foreground">PSI 분석</h3>
+          <div className="space-y-3">
+            {PSI_CONFIG.map((item) => (
+              <Card key={item.key} className={`rounded-2xl border-0 border-l-4 shadow-sm ${item.borderColor}`}>
+                <CardContent className="p-5">
+                  <div className="mb-3 flex items-center gap-2.5">
+                    <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${item.color}`}>
+                      <item.icon className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <span className="text-sm font-bold">{item.label}</span>
+                      <span className="ml-1.5 text-xs text-muted-foreground">{item.sub}</span>
+                    </div>
+                  </div>
+                  <p className="whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
+                    {experience[item.key] || "-"}
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {experienceFormat === "FREE" && (
+        <div>
+          <h3 className="mb-4 text-sm font-semibold text-muted-foreground">자유 양식</h3>
+          <Card className="rounded-2xl border-0 border-l-4 border-l-gray-400 shadow-sm">
+            <CardContent className="p-5">
+              <div className="mb-3 flex items-center gap-2.5">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 bg-gray-50 dark:bg-gray-900">
+                  <FileText className="h-4 w-4" />
+                </div>
+                <span className="text-sm font-bold">내용</span>
+              </div>
+              <p className="whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
+                {experience.content || "-"}
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       {/* Edit Dialog */}
       <Dialog open={editing} onOpenChange={setEditing}>
@@ -370,26 +469,54 @@ export default function ExperienceDetailPage({
                 className="rounded-xl"
               />
             </div>
-            {STAR_CONFIG.map((item) => (
+            {experienceFormat === "STAR" && STAR_CONFIG.map((item) => (
               <div key={item.key} className="space-y-2">
                 <Label className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
-                  <span
-                    className={`inline-flex h-5 w-5 items-center justify-center rounded ${item.color}`}
-                  >
+                  <span className={`inline-flex h-5 w-5 items-center justify-center rounded ${item.color}`}>
                     <item.icon className="h-3 w-3" />
                   </span>
                   {item.label} ({item.sub})
                 </Label>
                 <Textarea
                   value={form[item.key]}
-                  onChange={(e) =>
-                    setForm({ ...form, [item.key]: e.target.value })
-                  }
+                  onChange={(e) => setForm({ ...form, [item.key]: e.target.value })}
                   rows={3}
                   className="rounded-xl resize-none"
                 />
               </div>
             ))}
+            {experienceFormat === "PSI" && PSI_CONFIG.map((item) => (
+              <div key={item.key} className="space-y-2">
+                <Label className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
+                  <span className={`inline-flex h-5 w-5 items-center justify-center rounded ${item.color}`}>
+                    <item.icon className="h-3 w-3" />
+                  </span>
+                  {item.label} ({item.sub})
+                </Label>
+                <Textarea
+                  value={form[item.key]}
+                  onChange={(e) => setForm({ ...form, [item.key]: e.target.value })}
+                  rows={3}
+                  className="rounded-xl resize-none"
+                />
+              </div>
+            ))}
+            {experienceFormat === "FREE" && (
+              <div className="space-y-2">
+                <Label className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
+                  <span className="inline-flex h-5 w-5 items-center justify-center rounded text-gray-500 bg-gray-50">
+                    <FileText className="h-3 w-3" />
+                  </span>
+                  내용
+                </Label>
+                <Textarea
+                  value={form.content}
+                  onChange={(e) => setForm({ ...form, content: e.target.value })}
+                  rows={6}
+                  className="rounded-xl resize-none"
+                />
+              </div>
+            )}
           </div>
           <DialogFooter className="gap-2 sm:gap-0">
             <Button

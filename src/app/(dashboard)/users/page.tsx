@@ -124,6 +124,9 @@ export default function UsersPage() {
             <p className="text-xs text-muted-foreground truncate">
               {row.original.email}
             </p>
+            <p className="text-[10px] text-muted-foreground/60 font-mono truncate">
+              {row.original.id}
+            </p>
           </div>
         </Link>
       ),
