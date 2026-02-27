@@ -10,8 +10,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
-import { Trash2, CheckSquare, Square, MinusSquare } from "lucide-react";
+import { Trash2, CheckSquare, Square, MinusSquare, Pencil, Plus } from "lucide-react";
 import { toast } from "sonner";
+import { ExperienceFormDialog } from "@/components/users/experience-form-dialog";
+import type { Experience } from "@/types";
 
 type DeleteAction = {
   ids: string[] | null;
@@ -26,6 +28,10 @@ export function UserExperiencesTab({ userId }: { userId: string }) {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [deleteAction, setDeleteAction] = useState<DeleteAction | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [formDialog, setFormDialog] = useState<{ open: boolean; experience: Experience | null }>({
+    open: false,
+    experience: null,
+  });
 
   const experiences = data?.data ?? [];
 
@@ -146,14 +152,30 @@ export function UserExperiencesTab({ userId }: { userId: string }) {
               <Trash2 className="mr-1.5 h-3.5 w-3.5" />
               전체 삭제
             </Button>
+            <Button
+              size="sm"
+              className="rounded-full"
+              onClick={() => setFormDialog({ open: true, experience: null })}
+            >
+              <Plus className="mr-1.5 h-3.5 w-3.5" />
+              경험 추가
+            </Button>
           </div>
         </div>
       )}
 
       {experiences.length === 0 && (
         <Card className="rounded-2xl border-0 shadow-sm">
-          <CardContent className="py-12 text-center text-muted-foreground">
-            경험이 없습니다.
+          <CardContent className="py-12 text-center text-muted-foreground space-y-3">
+            <p>경험이 없습니다.</p>
+            <Button
+              size="sm"
+              className="rounded-full"
+              onClick={() => setFormDialog({ open: true, experience: null })}
+            >
+              <Plus className="mr-1.5 h-3.5 w-3.5" />
+              경험 추가
+            </Button>
           </CardContent>
         </Card>
       )}
@@ -220,6 +242,14 @@ export function UserExperiencesTab({ userId }: { userId: string }) {
             <Button
               variant="ghost"
               size="icon"
+              className="shrink-0 h-8 w-8 rounded-full text-muted-foreground hover:text-foreground"
+              onClick={() => setFormDialog({ open: true, experience: exp as Experience })}
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
               className="shrink-0 h-8 w-8 rounded-full text-muted-foreground hover:text-destructive"
               onClick={() =>
                 setDeleteAction({
@@ -256,6 +286,17 @@ export function UserExperiencesTab({ userId }: { userId: string }) {
         variant="destructive"
         loading={deleting}
         onConfirm={handleDelete}
+      />
+
+      <ExperienceFormDialog
+        open={formDialog.open}
+        onOpenChange={(open) => setFormDialog((prev) => ({ ...prev, open }))}
+        experience={formDialog.experience}
+        userId={userId}
+        onSuccess={() => {
+          queryClient.invalidateQueries({ queryKey: ["users", userId, "experiences"] });
+          queryClient.invalidateQueries({ queryKey: ["users", userId] });
+        }}
       />
     </div>
   );

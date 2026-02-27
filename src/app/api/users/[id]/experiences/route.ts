@@ -2,6 +2,49 @@ import { NextRequest, NextResponse } from "next/server";
 import { getQdrant, getCollectionName } from "@/lib/qdrant";
 import { getServerEnv } from "@/lib/env";
 
+export async function POST(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const env = await getServerEnv();
+    const qdrantClient = getQdrant(env);
+    const collection = getCollectionName(env);
+    const { id: userId } = await params;
+    const body = await req.json();
+
+    const id = crypto.randomUUID();
+    const now = new Date().toISOString();
+
+    // text-embedding-3-small 차원(1536) 기준 zero vector
+    // 어드민에서 생성된 경험은 벡터 검색 랭킹에 영향받지 않음
+    const zeroVector = new Array(1536).fill(0);
+
+    await qdrantClient.upsert(collection, {
+      points: [
+        {
+          id,
+          vector: zeroVector,
+          payload: {
+            user_id: userId,
+            ...body,
+            created_at: now,
+            updated_at: now,
+          },
+        },
+      ],
+    });
+
+    return NextResponse.json({ id, success: true });
+  } catch (error) {
+    console.error("Create experience error:", error);
+    return NextResponse.json(
+      { error: "Failed to create experience" },
+      { status: 500 }
+    );
+  }
+}
+
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
