@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import type { Experience, ExperienceWithUser, PaginatedResponse } from "@/types";
+import type { ExperienceWithUser, PaginatedResponse } from "@/types";
 
 interface UseExperiencesParams {
   page?: number;
@@ -43,27 +43,6 @@ export function useExperience(id: string) {
       return res.json();
     },
     enabled: !!id,
-  });
-}
-
-export function useUpdateExperience() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: async ({
-      id,
-      ...data
-    }: { id: string } & Partial<Experience>) => {
-      const res = await fetch(`/api/experiences/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      if (!res.ok) throw new Error("Failed to update experience");
-      return res.json();
-    },
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["experiences"] });
-    },
   });
 }
 

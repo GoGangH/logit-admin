@@ -1,32 +1,12 @@
 "use client";
 
-import { use, useState } from "react";
-import { useExperience, useUpdateExperience } from "@/hooks/use-experiences";
+import { use } from "react";
+import { useExperience } from "@/hooks/use-experiences";
 import { PageHeader } from "@/components/shared/page-header";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Pencil,
   User,
   Briefcase,
   Tag,
@@ -41,18 +21,6 @@ import {
   TrendingUp,
   FileText,
 } from "lucide-react";
-import { toast } from "sonner";
-import type { ExperienceType, ExperienceCategory, ExperienceFormat } from "@/types";
-
-const EXPERIENCE_TYPES: ExperienceType[] = [
-  "아르바이트", "인턴", "정규직", "계약직", "봉사 활동",
-  "수상경력", "동아리 활동", "연구 활동", "군복무", "개인 활동",
-];
-
-const EXPERIENCE_CATEGORIES: ExperienceCategory[] = [
-  "고객 가치 지향", "기술적 전문성", "협력적 소통", "주도적 실행력",
-  "논리적 분석력", "창의적 문제해결", "유연한 적응력", "끈기있는 책임감",
-];
 
 const STAR_CONFIG = [
   {
@@ -123,63 +91,8 @@ export default function ExperienceDetailPage({
 }) {
   const { id } = use(params);
   const { data: experience, isLoading } = useExperience(id);
-  const updateExperience = useUpdateExperience();
-  const [editing, setEditing] = useState(false);
-  const [form, setForm] = useState({
-    title: "",
-    experience_type: "" as ExperienceType,
-    category: "" as ExperienceCategory,
-    start_date: "",
-    end_date: "",
-    // STAR
-    situation: "",
-    task: "",
-    action: "",
-    result: "",
-    // PSI
-    problem: "",
-    solution: "",
-    impact: "",
-    // FREE
-    content: "",
-    tags: "",
-  });
 
-  const experienceFormat: ExperienceFormat = experience?.format ?? "STAR";
-
-  const openEdit = () => {
-    if (!experience) return;
-    setForm({
-      title: experience.title,
-      experience_type: experience.experience_type,
-      category: experience.category,
-      start_date: experience.start_date,
-      end_date: experience.end_date,
-      situation: experience.situation ?? "",
-      task: experience.task ?? "",
-      action: experience.action ?? "",
-      result: experience.result ?? "",
-      problem: experience.problem ?? "",
-      solution: experience.solution ?? "",
-      impact: experience.impact ?? "",
-      content: experience.content ?? "",
-      tags: experience.tags,
-    });
-    setEditing(true);
-  };
-
-  const handleSave = () => {
-    updateExperience.mutate(
-      { id, ...form },
-      {
-        onSuccess: () => {
-          toast.success("경험을 수정했습니다.");
-          setEditing(false);
-        },
-        onError: () => toast.error("수정에 실패했습니다."),
-      }
-    );
-  };
+  const experienceFormat = experience?.format ?? "STAR";
 
   if (isLoading) {
     return (
@@ -203,17 +116,7 @@ export default function ExperienceDetailPage({
 
   return (
     <div className="space-y-8">
-      <PageHeader title={experience.title}>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={openEdit}
-          className="rounded-full px-4"
-        >
-          <Pencil className="mr-2 h-3.5 w-3.5" />
-          수정
-        </Button>
-      </PageHeader>
+      <PageHeader title={experience.title} />
 
       {/* Info Cards */}
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -365,177 +268,6 @@ export default function ExperienceDetailPage({
           </Card>
         </div>
       )}
-
-      {/* Edit Dialog */}
-      <Dialog open={editing} onOpenChange={setEditing}>
-        <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-2xl rounded-2xl">
-          <DialogHeader>
-            <DialogTitle>경험 수정</DialogTitle>
-            <DialogDescription>경험 정보를 수정합니다.</DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-2">
-            <div className="space-y-2">
-              <Label className="text-xs font-medium text-muted-foreground">
-                제목
-              </Label>
-              <Input
-                value={form.title}
-                onChange={(e) => setForm({ ...form, title: e.target.value })}
-                className="rounded-xl"
-              />
-            </div>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label className="text-xs font-medium text-muted-foreground">
-                  유형
-                </Label>
-                <Select
-                  value={form.experience_type}
-                  onValueChange={(v) =>
-                    setForm({ ...form, experience_type: v as ExperienceType })
-                  }
-                >
-                  <SelectTrigger className="rounded-xl">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {EXPERIENCE_TYPES.map((t) => (
-                      <SelectItem key={t} value={t}>
-                        {t}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label className="text-xs font-medium text-muted-foreground">
-                  역량
-                </Label>
-                <Select
-                  value={form.category}
-                  onValueChange={(v) =>
-                    setForm({ ...form, category: v as ExperienceCategory })
-                  }
-                >
-                  <SelectTrigger className="rounded-xl">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {EXPERIENCE_CATEGORIES.map((c) => (
-                      <SelectItem key={c} value={c}>
-                        {c}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label className="text-xs font-medium text-muted-foreground">
-                  시작일
-                </Label>
-                <Input
-                  type="date"
-                  value={form.start_date}
-                  onChange={(e) =>
-                    setForm({ ...form, start_date: e.target.value })
-                  }
-                  className="rounded-xl"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-xs font-medium text-muted-foreground">
-                  종료일
-                </Label>
-                <Input
-                  type="date"
-                  value={form.end_date}
-                  onChange={(e) =>
-                    setForm({ ...form, end_date: e.target.value })
-                  }
-                  className="rounded-xl"
-                />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label className="text-xs font-medium text-muted-foreground">
-                태그
-              </Label>
-              <Input
-                value={form.tags}
-                onChange={(e) => setForm({ ...form, tags: e.target.value })}
-                placeholder="쉼표로 구분"
-                className="rounded-xl"
-              />
-            </div>
-            {experienceFormat === "STAR" && STAR_CONFIG.map((item) => (
-              <div key={item.key} className="space-y-2">
-                <Label className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
-                  <span className={`inline-flex h-5 w-5 items-center justify-center rounded ${item.color}`}>
-                    <item.icon className="h-3 w-3" />
-                  </span>
-                  {item.label} ({item.sub})
-                </Label>
-                <Textarea
-                  value={form[item.key]}
-                  onChange={(e) => setForm({ ...form, [item.key]: e.target.value })}
-                  rows={3}
-                  className="rounded-xl resize-none"
-                />
-              </div>
-            ))}
-            {experienceFormat === "PSI" && PSI_CONFIG.map((item) => (
-              <div key={item.key} className="space-y-2">
-                <Label className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
-                  <span className={`inline-flex h-5 w-5 items-center justify-center rounded ${item.color}`}>
-                    <item.icon className="h-3 w-3" />
-                  </span>
-                  {item.label} ({item.sub})
-                </Label>
-                <Textarea
-                  value={form[item.key]}
-                  onChange={(e) => setForm({ ...form, [item.key]: e.target.value })}
-                  rows={3}
-                  className="rounded-xl resize-none"
-                />
-              </div>
-            ))}
-            {experienceFormat === "FREE" && (
-              <div className="space-y-2">
-                <Label className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
-                  <span className="inline-flex h-5 w-5 items-center justify-center rounded text-gray-500 bg-gray-50">
-                    <FileText className="h-3 w-3" />
-                  </span>
-                  내용
-                </Label>
-                <Textarea
-                  value={form.content}
-                  onChange={(e) => setForm({ ...form, content: e.target.value })}
-                  rows={6}
-                  className="rounded-xl resize-none"
-                />
-              </div>
-            )}
-          </div>
-          <DialogFooter className="gap-2 sm:gap-0">
-            <Button
-              variant="ghost"
-              onClick={() => setEditing(false)}
-              className="rounded-xl"
-            >
-              취소
-            </Button>
-            <Button
-              onClick={handleSave}
-              disabled={updateExperience.isPending}
-              className="rounded-xl"
-            >
-              {updateExperience.isPending ? "저장 중..." : "저장"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

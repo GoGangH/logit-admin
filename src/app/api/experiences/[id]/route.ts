@@ -54,35 +54,6 @@ export async function GET(
   }
 }
 
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  try {
-    const env = await getServerEnv();
-    const qdrantClient = getQdrant(env);
-    const collection = getCollectionName(env);
-    const { id } = await params;
-    const body = await req.json();
-
-    await qdrantClient.setPayload(collection, {
-      points: [id],
-      payload: {
-        ...body,
-        updated_at: new Date().toISOString(),
-      },
-    });
-
-    return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error("Experience update error:", error);
-    return NextResponse.json(
-      { error: "Failed to update experience" },
-      { status: 500 }
-    );
-  }
-}
-
 export async function DELETE(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
